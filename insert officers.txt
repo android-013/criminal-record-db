@@ -1,0 +1,29 @@
+-- Inserts 20 sample records into the "crimes" table.
+-- Each crime is linked to a unique criminal (IDs 1-20) and one of the five officers (IDs 1-5).
+-- This script assumes the criminal and officer IDs were generated sequentially starting from 1.
+
+INSERT INTO public.crimes (crime_type, date_committed, location, description, criminal_id, officer_id)
+VALUES
+  ('Theft', '2024-01-10', 'Shib bari More, Khulna', 'Stole a motorcycle from a parking lot.', 1, 1),
+  ('Robbery', '2024-01-15', 'New Market Area, Khulna', 'Armed robbery at a jewelry store.', 2, 2),
+  ('Assault', '2024-02-05', 'Rupsha Bridge, Khulna', 'Physical altercation resulting in injury.', 3, 3),
+  ('Burglary', '2024-02-20', 'Sonadanga, Khulna', 'Broke into a residence and stole electronics.', 4, 4),
+  ('Vandalism', '2024-03-01', 'Khulna University Campus', 'Graffiti on public property.', 5, 5),
+  ('Theft', '2024-03-12', 'Gollamari, Khulna', 'Shoplifting from a department store.', 6, 1),
+  ('Fraud', '2024-04-02', 'Daulatpur, Khulna', 'Credit card fraud scheme.', 7, 2),
+  ('Assault', '2024-04-18', 'Khalishpur, Khulna', 'Assaulted a pedestrian during a dispute.', 8, 3),
+  ('Robbery', '2024-05-09', 'KDA Avenue, Khulna', 'Mugging at an ATM.', 9, 4),
+  ('Burglary', '2024-05-25', 'Nirala, Khulna', 'Forced entry into a warehouse.', 10, 5),
+  ('Theft', '2024-06-03', 'Picture Palace More, Khulna', 'Pickpocketing in a crowded area.', 11, 1),
+  ('Vandalism', '2024-06-15', 'Fulbari Gate, Khulna', 'Damaged park benches and lights.', 12, 2),
+  ('Assault', '2024-07-01', 'Boyra Bazar, Khulna', 'A fight broke out between two individuals.', 13, 3),
+  ('Fraud', '2024-07-11', 'Phultala, Khulna', 'Online scam targeting elderly.', 14, 4),
+  ('Robbery', '2024-08-05', 'City Inn Hotel, Khulna', 'Stole valuables from a hotel guest.', 15, 5),
+  ('Theft', '2024-08-20', 'Khulna Railway Station', 'Luggage theft from the platform.', 16, 1),
+  ('Burglary', '2024-09-10', 'Moylapota More, Khulna', 'Broke into an office overnight.', 17, 2),
+  ('Assault', '2024-09-22', 'Royal More, Khulna', 'Minor altercation at a tea stall.', 18, 3),
+  ('Vandalism', '2024-10-07', 'UN Park, Khulna', 'Destroyed public art installation.', 19, 4),
+  ('Theft', '2024-10-18', 'Dak Bungalow More, Khulna', 'Snatched a handbag from a pedestrian.', 20, 5);
+
+-- Note: Running this script assumes your criminal IDs are 1-20 and officer IDs are 1-5.
+-- If your IDs are different (e.g., UUIDs), you will need to replace them manually.
