@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Officer Cases Dashboard</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 20px; }
+  h1 { text-align: center; color: #333; }
+  .officer-card { background: white; padding: 15px; margin-bottom: 20px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  h2 { margin-top: 0; color: #4f46e5; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+  th { background: #4f46e5; color: white; }
+  tr:nth-child(even) { background: #f9f9f9; }
+  .loading { text-align: center; font-size: 18px; color: #666; }
+  .search-box { margin-bottom: 10px; }
+  .search-box input { padding: 6px 10px; width: 250px; border-radius: 4px; border: 1px solid #ccc; }
+  .section-title { margin: 10px 0 5px 0; font-weight: bold; color: #10b981; }
+</style>
+</head>
+<body>
+
+<h1>Officer Cases Dashboard</h1>
+
+<div class="search-box">
+  <input type="text" id="dashboardSearch" placeholder="Search officers, criminals, or crimes...">
+</div>
+
+<div id="loading" class="loading">Loading data...</div>
+<div id="dashboard"></div>
+
+<script>
+const SUPABASE_URL = "https://pljllsmjzuitkyrhmuye.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsamxsc21qenVpdGt5cmhtdXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MzU1MDMsImV4cCI6MjA3MTExMTUwM30.kIHKC4CAY3XMICykxgDZkD2D5RldKP2a7i-KwbSBr8s";
+
+async function fetchRPC(functionName) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${functionName}`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({})
+  });
+  if (!res.ok) throw new Error("HTTP error " + res.status);
+  return await res.json();
+}
+
+async function loadDashboard() {
+  try {
+    const data = await fetchRPC("get_officer_cases");
+    const container = document.getElementById("dashboard");
+    container.innerHTML = "";
+
+    // Group by officer_id
+    const officerMap = {};
+    data.forEach(row => {
+      const oId = row.officer_id;
+      if (!officerMap[oId]) {
+        officerMap[oId] = {
+          info: {
+            id: row.officer_id,
+            name: row.officer_name,
+            rank: row.officer_rank,
+            badge_number: row.badge_number,
+            station: row.police_station,
+            created_at: row.created_at_officer
+          },
+          criminals: [],
+          crimes: []
+        };
+      }
+
+      // Add criminal if exists and not duplicate
+      if (row.criminal_id && !officerMap[oId].criminals.some(c => c.id === row.criminal_id)) {
+        officerMap[oId].criminals.push({
+          id: row.criminal_id,
+          name: row.criminal_name,
+          nid: row.criminal_nid,
+          status: row.criminal_status,
+          dob: row.criminal_dob,
+          created_at: row.created_at_criminal
+        });
+      }
+
+      // Add crime if exists and not duplicate
+      if (row.crime_id && !officerMap[oId].crimes.some(c => c.id === row.crime_id)) {
+        officerMap[oId].crimes.push({
+          id: row.crime_id,
+          type: row.crime_type,
+          date: row.crime_date,
+          location: row.crime_location,
+          description: row.crime_description,
+          created_at: row.crime_created_at
+        });
+      }
+    });
+
+    // Render officers
+    Object.values(officerMap).forEach(officer => {
+      const card = document.createElement("div");
+      card.className = "officer-card";
+
+      card.innerHTML = `
+        <h2>${officer.info.name} (${officer.info.rank || "Unknown Rank"})</h2>
+        <strong>Badge Number:</strong> ${officer.info.badge_number || "-"}<br>
+        <strong>Police Station:</strong> ${officer.info.station || "-"}<br>
+        <strong>Created At:</strong> ${new Date(officer.info.created_at).toLocaleString()}
+      `;
+
+      // Criminals
+      card.appendChild(document.createElement("div")).className = "section-title";
+      card.querySelector(".section-title").innerText = "Criminals:";
+      if (officer.criminals.length) {
+        const cTable = document.createElement("table");
+        cTable.innerHTML = `<thead>
+          <tr><th>ID</th><th>Name</th><th>NID</th><th>Status</th><th>DOB</th><th>Created At</th></tr>
+        </thead><tbody>` +
+          officer.criminals.map(c => `<tr>
+            <td>${c.id}</td>
+            <td>${c.name}</td>
+            <td>${c.nid || "-"}</td>
+            <td>${c.status || "-"}</td>
+            <td>${c.dob || "-"}</td>
+            <td>${new Date(c.created_at).toLocaleString()}</td>
+          </tr>`).join('') + `</tbody>`;
+        card.appendChild(cTable);
+      } else {
+        card.appendChild(document.createTextNode("No criminals linked."));
+      }
+
+      // Crimes
+      const crimeTitle = document.createElement("div");
+      crimeTitle.className = "section-title";
+      crimeTitle.innerText = "Crimes:";
+      card.appendChild(crimeTitle);
+
+      if (officer.crimes.length) {
+        const crTable = document.createElement("table");
+        crTable.innerHTML = `<thead>
+          <tr><th>ID</th><th>Type</th><th>Date</th><th>Location</th><th>Description</th></tr>
+        </thead><tbody>` +
+          officer.crimes.map(cr => `<tr>
+            <td>${cr.id}</td>
+            <td>${cr.type}</td>
+            <td>${cr.date || "-"}</td>
+            <td>${cr.location || "-"}</td>
+            <td>${cr.description || "-"}</td>
+          </tr>`).join('') + `</tbody>`;
+        card.appendChild(crTable);
+      } else {
+        card.appendChild(document.createTextNode("No crimes linked."));
+      }
+
+      container.appendChild(card);
+    });
+
+    document.getElementById("loading").style.display = "none";
+
+    // Search functionality
+    const searchInput = document.getElementById('dashboardSearch');
+    searchInput.addEventListener('input', function() {
+      const filter = this.value.toLowerCase();
+      document.querySelectorAll('.officer-card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(filter) ? '' : 'none';
+      });
+    });
+
+  } catch (err) {
+    document.getElementById("loading").innerText = "Error loading dashboard.";
+    console.error(err);
+  }
+}
+
+loadDashboard();
+</script>
+</body>
+</html>
