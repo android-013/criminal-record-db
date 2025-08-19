@@ -1,0 +1,28 @@
+-- Inserts 20 sample records into the "criminals" table.
+-- Each criminal is assigned an 'officer_id' from the existing officers (assumed IDs 1-5).
+-- The 'id' and 'created_at' columns are populated automatically.
+
+INSERT INTO public.criminals (nid, name, dob, status, officer_id)
+VALUES
+  ('19901234567890001', 'Rahman Ali', '1990-05-15', 'Incarcerated', 1),
+  ('19851234567890002', 'Selina Akter', '1985-11-20', 'At Large', 2),
+  ('19921234567890003', 'Kamal Hossain', '1992-02-10', 'On Bail', 3),
+  ('19881234567890004', 'Nasrin Begum', '1988-07-30', 'Incarcerated', 4),
+  ('19951234567890005', 'Firoz Khan', '1995-09-05', 'Released', 5),
+  ('19911234567890006', 'Tariqul Islam', '1991-03-25', 'At Large', 1),
+  ('19871234567890007', 'Ayesha Siddika', '1987-12-12', 'Incarcerated', 2),
+  ('19931234567890008', 'Mehedi Hasan', '1993-06-18', 'On Bail', 3),
+  ('19891234567890009', 'Sharmin Sultana', '1989-10-22', 'Incarcerated', 4),
+  ('19961234567890010', 'Imran Mahmud', '1996-01-14', 'Released', 5),
+  ('19901234567890011', 'Rashed Kabir', '1990-08-01', 'At Large', 1),
+  ('19861234567890012', 'Farzana Yasmin', '1986-04-19', 'Incarcerated', 2),
+  ('19941234567890013', 'Sajid Ahmed', '1994-11-08', 'On Bail', 3),
+  ('19841234567890014', 'Maliha Rahman', '1984-02-28', 'Incarcerated', 4),
+  ('19971234567890015', 'Arif Hossain', '1997-07-07', 'Released', 5),
+  ('19921234567890016', 'Zahid Hasan', '1992-05-16', 'At Large', 1),
+  ('19881234567890017', 'Nusrat Jahan', '1988-09-30', 'Incarcerated', 2),
+  ('19951234567890018', 'Tanvir Ahmed', '1995-03-03', 'On Bail', 3),
+  ('19891234567890019', 'Ishrat Parvin', '1989-06-11', 'Incarcerated', 4),
+  ('19981234567890020', 'Monirul Islam', '1998-10-01', 'Released', 5);
+
+-- Note: The 'nid' column is unique. Running this script again will cause an error.
