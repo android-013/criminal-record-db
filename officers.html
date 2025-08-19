@@ -42,6 +42,30 @@
 </head>
 <body>
   <h1>Police Officers</h1>
+    <!-- Search Box -->
+    <div style="margin-bottom: 10px; text-align: center;">
+        <input
+            type="text"
+            id="tableSearch"
+            placeholder="Search..."
+            style="padding: 6px 10px; width: 200px; border-radius: 4px; border: 1px solid #ccc;"
+        />
+    </div>
+
+    <script>
+    // Table Search Function
+    const searchInput = document.getElementById('tableSearch');
+    searchInput.addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const table = document.querySelector('table'); // assumes one table per page
+        const rows = table.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+    </script>
   <div id="loading" class="loading">Loading officers...</div>
   <table id="officersTable" style="display:none;">
     <thead>
