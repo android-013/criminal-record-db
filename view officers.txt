@@ -1,0 +1,7 @@
+-- Create SQL function to get all officers
+create or replace function public.get_officers()
+returns setof public.officers
+language sql
+as $$
+  select * from public.officers order by id;
+$$;

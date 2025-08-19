@@ -58,50 +58,56 @@
   </table>
 
   <script>
-  const SUPABASE_URL = "https://pljllsmjzuitkyrhmuye.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsamxsc21qenVpdGt5cmhtdXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MzU1MDMsImV4cCI6MjA3MTExMTUwM30.kIHKC4CAY3XMICykxgDZkD2D5RldKP2a7i-KwbSBr8s";
+    const SUPABASE_URL = "https://pljllsmjzuitkyrhmuye.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsamxsc21qenVpdGt5cmhtdXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MzU1MDMsImV4cCI6MjA3MTExMTUwM30.kIHKC4CAY3XMICykxgDZkD2D5RldKP2a7i-KwbSBr8s";
 
-  async function loadOfficers() {
-    try {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/officers?select=*`, {
-        method: "GET",
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Content-Type": "application/json"
+    async function loadOfficers() {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/officers?select=*`, {
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("HTTP error " + response.status);
         }
-      });
 
-      if (!response.ok) {
-        throw new Error("HTTP error " + response.status);
+        const officers = await response.json();
+        console.log("Officers from Supabase:", officers); // ✅ Shows in console
+
+        const table = document.getElementById("officersTable");
+        const tbody = table.querySelector("tbody");
+
+        // Clear previous rows
+        tbody.innerHTML = "";
+
+        // Insert each officer into table
+        officers.forEach(o => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${o.id}</td>
+            <td>${o.name}</td>
+            <td>${o.badge_number || "-"}</td>
+            <td>${o.rank || "-"}</td>
+            <td>${o.police_station || "-"}</td>
+            <td>${new Date(o.created_at).toLocaleString()}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        // Hide loading, show table
+        document.getElementById("loading").style.display = "none";
+        table.style.display = "table";
+
+      } catch (err) {
+        document.getElementById("loading").innerText = "Error loading officers.";
+        console.error("Error loading officers:", err);
       }
-
-      const officers = await response.json();
-      console.log("Officers:", officers);
-
-      // Example: render in page
-      const tbody = document.querySelector("tbody");
-      tbody.innerHTML = "";
-      officers.forEach(o => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${o.id}</td>
-          <td>${o.name}</td>
-          <td>${o.badge_number || "-"}</td>
-          <td>${o.rank || "-"}</td>
-          <td>${o.police_station || "-"}</td>
-          <td>${new Date(o.created_at).toLocaleString()}</td>
-        `;
-        tbody.appendChild(row);
-      });
-
-    } catch (err) {
-      console.error("Error loading officers:", err);
     }
-  }
 
-  loadOfficers();
-</script>
-
+    loadOfficers();
+  </script>
 </body>
 </html>
