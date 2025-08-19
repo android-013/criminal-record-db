@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Crime Records</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: #10b981;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    .loading {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 18px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Crime Records</h1>
+  <div id="loading" class="loading">Loading crimes...</div>
+  <table id="crimesTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Date Committed</th>
+        <th>Location</th>
+        <th>Description</th>
+        <th>Criminal</th>
+        <th>Officer</th>
+        <th>Created At</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const SUPABASE_URL = "https://pljllsmjzuitkyrhmuye.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsamxsc21qenVpdGt5cmhtdXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MzU1MDMsImV4cCI6MjA3MTExMTUwM30.kIHKC4CAY3XMICykxgDZkD2D5RldKP2a7i-KwbSBr8s";
+
+    async function loadCrimes() {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_crimes`, {
+          method: "POST",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({})
+        });
+
+        if (!response.ok) throw new Error("HTTP error " + response.status);
+
+        const crimes = await response.json();
+        console.log("Crimes:", crimes);
+
+        const table = document.getElementById("crimesTable");
+        const tbody = table.querySelector("tbody");
+        tbody.innerHTML = "";
+
+        crimes.forEach(c => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${c.id}</td>
+            <td>${c.crime_type}</td>
+            <td>${c.date_committed || "-"}</td>
+            <td>${c.location || "-"}</td>
+            <td>${c.description || "-"}</td>
+            <td>${c.criminal_name || "-"}</td>
+            <td>${c.officer_name || "-"}</td>
+            <td>${new Date(c.created_at).toLocaleString()}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        document.getElementById("loading").style.display = "none";
+        table.style.display = "table";
+
+      } catch (err) {
+        document.getElementById("loading").innerText = "Error loading crimes.";
+        console.error("Error loading crimes:", err);
+      }
+    }
+
+    loadCrimes();
+  </script>
+</body>
+</html>
