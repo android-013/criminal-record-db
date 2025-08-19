@@ -1,0 +1,14 @@
+-- Inserts multiple records into the "officers" table.
+-- The columns specified are name, badge_number, rank, and police_station.
+-- The 'id' and 'created_at' columns will be automatically populated by the database.
+
+INSERT INTO public.officers (name, badge_number, rank, police_station)
+VALUES
+  ('Karim Ahmed', 'BD7501', 'Inspector', 'Khulna Sadar Thana'),
+  ('Fatima Chowdhury', 'BD7502', 'Sub-Inspector', 'Sonadanga Model Thana'),
+  ('Jamal Uddin', 'BD7503', 'Sergeant', 'Daulatpur Thana'),
+  ('Anisul Islam', 'BD7504', 'Constable', 'Khalishpur Thana'),
+  ('Rahima Khatun', 'BD7505', 'Sub-Inspector', 'Khulna Sadar Thana');
+
+-- Note: If you run this script more than once, it will fail because the 'badge_number'
+-- column has a UNIQUE constraint. This is expected behavior to prevent duplicate data.
