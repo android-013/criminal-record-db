@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel - Add Criminal & Crime</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 20px; }
+  h1 { text-align: center; color: #333; }
+  form { background: white; padding: 20px; border-radius: 6px; max-width: 600px; margin: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  label { display: block; margin-top: 10px; font-weight: bold; }
+  input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; }
+  button { margin-top: 15px; padding: 10px 15px; background: #4f46e5; color: white; border: none; border-radius: 4px; cursor: pointer; }
+  button:hover { background: #3b36b0; }
+  .message { margin-top: 15px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Admin Panel</h1>
+
+<form id="adminForm">
+  <h2>Criminal Details</h2>
+  <label for="criminal_name">Name</label>
+  <input type="text" id="criminal_name" required>
+
+  <label for="criminal_nid">NID</label>
+  <input type="text" id="criminal_nid">
+
+  <label for="criminal_dob">Date of Birth</label>
+  <input type="date" id="criminal_dob">
+
+  <label for="criminal_status">Status</label>
+  <input type="text" id="criminal_status">
+
+  <label for="officer_id">Officer ID</label>
+  <input type="number" id="officer_id" required>
+
+  <h2>Crime Details</h2>
+  <label for="crime_type">Crime Type</label>
+  <input type="text" id="crime_type" required>
+
+  <label for="crime_date">Date Committed</label>
+  <input type="date" id="crime_date">
+
+  <label for="crime_location">Location</label>
+  <input type="text" id="crime_location">
+
+  <label for="crime_description">Description</label>
+  <textarea id="crime_description" rows="3"></textarea>
+
+  <button type="submit">Submit</button>
+  <div class="message" id="formMessage"></div>
+</form>
+
+<script>
+const SUPABASE_URL = "https://pljllsmjzuitkyrhmuye.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsamxsc21qenVpdGt5cmhtdXllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1MzU1MDMsImV4cCI6MjA3MTExMTUwM30.kIHKC4CAY3XMICykxgDZkD2D5RldKP2a7i-KwbSBr8s";
+
+async function callRPC(functionName, params) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${functionName}`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(params)
+  });
+  if (!res.ok) throw new Error("HTTP error " + res.status);
+  return await res.json();
+}
+
+document.getElementById("adminForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msgDiv = document.getElementById("formMessage");
+  msgDiv.textContent = "Submitting...";
+  
+  try {
+    // 1. Insert Criminal
+    const criminal_id = await callRPC("insert_criminal", {
+      _nid: document.getElementById("criminal_nid").value || null,
+      _name: document.getElementById("criminal_name").value,
+      _dob: document.getElementById("criminal_dob").value || null,
+      _status: document.getElementById("criminal_status").value || null,
+      _officer_id: parseInt(document.getElementById("officer_id").value)
+    });
+
+    // 2. Insert Crime
+    await callRPC("insert_crime", {
+      _crime_type: document.getElementById("crime_type").value,
+      _date_committed: document.getElementById("crime_date").value || null,
+      _location: document.getElementById("crime_location").value || null,
+      _description: document.getElementById("crime_description").value || null,
+      _criminal_id: parseInt(criminal_id),
+      _officer_id: parseInt(document.getElementById("officer_id").value)
+    });
+
+    msgDiv.style.color = "green";
+    msgDiv.textContent = "Criminal and Crime added successfully!";
+    document.getElementById("adminForm").reset();
+
+  } catch (err) {
+    console.error(err);
+    msgDiv.style.color = "red";
+    msgDiv.textContent = "Error submitting data. See console.";
+  }
+});
+</script>
+
+</body>
+</html>
