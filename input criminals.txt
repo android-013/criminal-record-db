@@ -1,0 +1,20 @@
+CREATE OR REPLACE FUNCTION public.insert_criminal(
+    _nid text,
+    _name text,
+    _dob date,
+    _status text,
+    _officer_id bigint
+)
+RETURNS bigint
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    new_id bigint;
+BEGIN
+    INSERT INTO public.criminals(nid, name, dob, status, officer_id)
+    VALUES (_nid, _name, _dob, _status, _officer_id)
+    RETURNING id INTO new_id;
+
+    RETURN new_id;
+END;
+$$;
