@@ -1,0 +1,50 @@
+CREATE OR REPLACE FUNCTION public.get_officer_cases()
+RETURNS TABLE (
+    officer_id bigint,
+    officer_name text,
+    officer_rank text,
+    badge_number text,
+    police_station text,
+    created_at_officer timestamptz,
+    criminal_id bigint,
+    criminal_name text,
+    criminal_nid text,
+    criminal_status text,
+    criminal_dob date,
+    created_at_criminal timestamptz,
+    crime_id bigint,
+    crime_type text,
+    crime_date date,
+    crime_location text,
+    crime_description text,
+    crime_created_at timestamptz
+)
+LANGUAGE sql
+AS $$
+  SELECT
+    o.id AS officer_id,
+    o.name AS officer_name,
+    o.rank AS officer_rank,
+    o.badge_number,
+    o.police_station,
+    o.created_at AS created_at_officer,
+    
+    c.id AS criminal_id,
+    c.name AS criminal_name,
+    c.nid AS criminal_nid,
+    c.status AS criminal_status,
+    c.dob AS criminal_dob,
+    c.created_at AS created_at_criminal,
+    
+    cr.id AS crime_id,
+    cr.crime_type,
+    cr.date_committed AS crime_date,
+    cr.location AS crime_location,
+    cr.description AS crime_description,
+    cr.created_at AS crime_created_at
+
+  FROM public.officers o
+  LEFT JOIN public.criminals c ON c.officer_id = o.id
+  LEFT JOIN public.crimes cr ON cr.officer_id = o.id
+  ORDER BY o.id, c.id, cr.id;
+$$;
