@@ -1,0 +1,2 @@
+-- Enable row-level security
+ALTER TABLE public.criminals ENABLE ROW LEVEL SECURITY;
