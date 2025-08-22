@@ -1,0 +1,9 @@
+-- Enable row-level security
+ALTER TABLE public.crimes ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access via anon key
+CREATE POLICY "Public read access"
+ON public.crimes
+FOR SELECT
+TO anon
+USING (true);
