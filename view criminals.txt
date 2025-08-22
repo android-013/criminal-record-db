@@ -1,0 +1,25 @@
+-- Function to get all criminals with officer name
+create or replace function public.get_criminals()
+returns table (
+    id bigint,
+    nid text,
+    name text,
+    dob date,
+    status text,
+    officer_name text,
+    created_at timestamptz
+)
+language sql
+as $$
+  select
+    c.id,
+    c.nid,
+    c.name,
+    c.dob,
+    c.status,
+    o.name as officer_name,
+    c.created_at
+  from public.criminals c
+  left join public.officers o on c.officer_id = o.id
+  order by c.id;
+$$;
